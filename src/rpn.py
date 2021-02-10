@@ -1,19 +1,31 @@
-import re
+from typing import List, Union, Optional
+
+operators = ["+", "/", "*", "-"]
 
 
 class InvalidNotationException(Exception):
-    def __init__(self, rpn_expression: str, message: str):
-        msg = f"{message}.\nExpression: '{rpn_expression}'."
-        super().__init__(msg)
+    def __init__(self, message: str, rpn_expression: str = None):
+        if rpn_expression:
+            message += f"Expression: {rpn_expression}"
+        super().__init__(message)
 
 
-def validate(rpn_expression: str):
-    invalids = re.findall(r"([^\d+\-*/ ])", rpn_expression)
-    if invalids:
-        raise InvalidNotationException(rpn_expression, f"Invalid characters: '{' '.join(invalids).rstrip()}'")
+def to_list(rpn_expression: str) -> List[Union[float, str]]:
+    result = []
+    for r in rpn_expression.split():
+        if r in operators:
+            result.append(r)
+            continue
+        try:
+            # TODO: how liberal is float? What will it do with False for example?
+            result.append(float(r))
+        except ValueError:
+            raise InvalidNotationException(f"'{r}' is not a valid operator or float value")
+
+    return result
 
 
-def _operate(operator: str, a: float, b: float) -> float:
+def _operate(a: float, b: float, operator: str) -> float:
     if operator == "+":
         return a + b
     if operator == "-":
@@ -24,32 +36,34 @@ def _operate(operator: str, a: float, b: float) -> float:
         return a / b
 
 
+# The action is when we hit an operator, apply this thing to the last two things in the array (replace them)
 def calculate(rpn_expression: str) -> float:
-    validate(rpn_expression)
-    stack = rpn_expression.split()
-    stack.reverse()
-    memory = []
+    stack = to_list(rpn_expression)
+    i = 0
 
     limit = 100
-    while limit > 0 and len(stack):
-        current = stack.pop()
+    # TODO: risk of infinity here if something goes wrong
+    while len(stack):
 
-        if current not in ["+", "/", "*", "-"]:
-            memory.append(float(current))
-            continue
-
-        back_one = memory.pop()
-        back_two = memory.pop()
-        result = _operate(current, back_two, back_one)
-        memory.append(result)
-        stack = stack + memory
+        if not limit:
+            raise Exception("HIT LIMIT")
+        limit -= 1
 
         if len(stack) == 1:
             return stack[0]
 
-        memory = []
+        current = stack[i]
+        if current in operators:
+            before_this_unit = stack[0:i - 2]
+            result_for_this_unit = _operate(stack[i - 2], stack[i - 1], current)
+            rest_of_stack = stack[i+1:]
 
-        limit -= 1
+            stack = before_this_unit + [result_for_this_unit] + rest_of_stack
+            i = len(before_this_unit) + 1
+            continue
+
+        i += 1
+
 
 
     # TODO: initial validation (separate function)

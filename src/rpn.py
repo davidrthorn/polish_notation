@@ -1,11 +1,10 @@
 from typing import List, Union
-import re
 
 operators = ["+", "/", "*", "-"]
 
 
 class InvalidNotationException(Exception):
-    def __init__(self, message: str, rpn_expression: str = None):
+    def __init__(self, message: str = "Expression could not be processed", rpn_expression: str = None):
         if rpn_expression:
             message += f"\nExpression: {rpn_expression}"
         super().__init__(message)
@@ -20,15 +19,16 @@ def to_list(rpn_expression: str) -> List[Union[float, str]]:
         if r in operators:
             result.append(r)
             continue
+
         try:
-            result.append(float(r))  # This currently allows the awful expression "False 2.0 +" -- naughty Python!
+            result.append(float(r))
         except ValueError:
             raise InvalidNotationException(f"'{r}' is not a valid operator or float value")
 
     return result
 
 
-def _calculate_unit(a: float, b: float, operator: str) -> float:
+def calculate_unit(a: float, b: float, operator: str) -> float:
     if operator == "+":
         return a + b
     if operator == "-":
@@ -48,28 +48,21 @@ def calculate(rpn_expression: str) -> float:
         try:
             item = stack[i]
         except IndexError:
-            # TODO: would be nice to say why, but we covered the main reasons below anyway
-            raise InvalidNotationException("Expression could not be processed", rpn_expression)
+            raise InvalidNotationException(rpn_expression=rpn_expression)
 
         if item not in operators:
-            if i == len(stack) - 1:
-                raise InvalidNotationException("Expressions cannot end with a number", rpn_expression)
             i += 1
             continue
 
         # We've hit an operator, so we should have a calculable unit (this operator and the two previous numbers)
-
-        if i < 2:
-            raise InvalidNotationException(
-                f"Found an operator not preceded by two or more numbers at position {i}",
-                rpn_expression
-            )
-
         operand_1 = stack[i-2]
         operand_2 = stack[i-1]
         operator = item
 
-        result = _calculate_unit(operand_1, operand_2, operator)
+        if not isinstance(operand_1, float) or not isinstance(operand_2, float):
+            raise InvalidNotationException(rpn_expression=rpn_expression)
+
+        result = calculate_unit(operand_1, operand_2, operator)
 
         stack_before_unit = stack[0:i-2]
         stack_after_unit = stack[i+1:]

@@ -38,6 +38,10 @@ def test_calculate_expression_with_complex_nesting_gives_correct_answer():
     assert calculate("5 3 + 10 6 2 / - * 4 +") == 60  # (5 + 3) * (10 - (6 / 2)) + 4 == 60
 
 
+def test_calculate_expression_with_decimals_returns_correct_result():
+    assert calculate("1.2 2 /") == 0.6
+
+
 def test_calculate_expression_with_negative_number_gives_correct_answer():
     assert calculate("-2 10 *") == -20
 

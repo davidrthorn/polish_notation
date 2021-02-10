@@ -1,6 +1,6 @@
 import pytest
 
-from main import calculate, InvalidNotationException
+from src.rpn import calculate, InvalidNotationException
 
 
 '''
@@ -52,8 +52,9 @@ def test_calculate_empty_string_expression_throws():  # because returning 0 woul
 
 
 def test_calculate_expression_with_invalid_chars_throws():
-    with pytest.raises(InvalidNotationException):
+    with pytest.raises(InvalidNotationException) as e:
         calculate("34 + B")
+    assert "Invalid characters: 'B'" in str(e.value)
 
 
 # TODO: The exception thrown here should be informative

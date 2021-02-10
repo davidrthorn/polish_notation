@@ -45,7 +45,12 @@ def calculate(rpn_expression: str) -> float:
     i = 0
     while len(stack) > 1:
 
-        item = stack[i]
+        try:
+            item = stack[i]
+        except IndexError:
+            # TODO: would be nice to say why, but we covered the main reasons below anyway
+            raise InvalidNotationException("Expression could not be processed", rpn_expression)
+
         if item not in operators:
             if i == len(stack) - 1:
                 raise InvalidNotationException("Expressions cannot end with a number", rpn_expression)

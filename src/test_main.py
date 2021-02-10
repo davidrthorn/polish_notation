@@ -1,6 +1,6 @@
 import pytest
 
-from src.rpn import calculate, InvalidNotationException
+from src.rpn import calculate, InvalidNotationException, to_list
 
 
 '''
@@ -32,6 +32,10 @@ def test_calculate_expression_with_insufficient_sequential_numbers_throws():
 '''
 Additional examples
 '''
+
+
+def test_to_list_returns_list_of_floats_and_symbols_when_input_valid():
+    assert to_list("1 2 +") == [1.0, 2.0, '+']
 
 
 def test_calculate_expression_with_complex_nesting_gives_correct_answer():

@@ -1,6 +1,6 @@
 from typing import List, Union
 
-operators = ["+", "/", "*", "-"]
+operators = ["+", "-", "*", "/"]
 
 
 class InvalidNotationException(Exception):

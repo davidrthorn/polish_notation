@@ -74,3 +74,40 @@ def calculate(rpn_expression: str) -> float:
         i = len(stack_before_unit) + 1
 
     return stack[0]
+
+
+'''
+BONUS RECURSIVE IMPLEMENTATION (that doesn't quite work -- see test_recursive.py)
+
+The problem I have not solved looks like this:
+
+Every RPN expression is composed of an operator and two valid RPN expressions, where a number
+is considered valid.
+
+We also know that every valid RPN expression ends with an operator.
+
+Hence, we know that every RPN expression can be evaluated by applying its final operator to the
+two operands preceding it...
+
+...if we can figure out what those operands are. We need to be able to split any string preceding
+the final operand into two operands that can, in turn, be evaluated. I thought I'd achieved this here,
+but the complex case ('5 3 + 10 6 2 / - * 4 +') still fails. The implementation here cannot deal with
+the fact that the first operand in that case is '5 3 +'. that is to say, it can't deal with there being
+two operands that are themselves non-numerical RPN expressions. It doesn't know (right now) where to
+split things up.
+'''
+
+
+def calculate_recursive(rpn_expression):
+    return _calculate_recursive(to_list(rpn_expression))
+
+
+def _calculate_recursive(data):
+    operator = data[-1]
+    if len(data) == 3:
+        return calculate_unit(data[-3], data[-2], operator)
+    if isinstance(data[-2], float):
+        return calculate_unit(_calculate_recursive(data[0:-2]), data[-2], operator)
+    return calculate_unit(data[0], _calculate_recursive(data[1:-1]), operator)
+
+

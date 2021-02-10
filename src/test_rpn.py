@@ -33,6 +33,10 @@ Additional examples
 '''
 
 
+def test_calculate_expression_with_single_number_returns_correct_result():
+    assert calculate("5") == 5
+
+
 def test_calculate_expression_with_complex_nesting_returns_correct_result():
     assert calculate("5 3 + 10 6 2 / - * 4 +") == 60
 

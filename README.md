@@ -7,7 +7,8 @@ in Reverse Polish Notation.
 1. Create and activate a Python 3 virtual environment (if you don't want to install pytest globally)
 2. Install the requirements with `pip install -r requirements.txt` from the project root
    - You might need to run `pip3` instead depending on your default system python
-3. Run tests with `pytest --verbose` from the project root 
+3. Run tests with `pytest --verbose` from the project root (one expected failure -- see notes
+   for bonus recursive implementation in `src/rpn.py`)
 
 The code does not currently provide a command line interface. You can run it interactively as follows:
 
@@ -18,5 +19,4 @@ The code does not currently provide a command line interface. You can run it int
 # Room for improvement
 
 - Handle more operators (`sin`, `sqrt`, `log` etc.)
-- Reimplement recursively (debatable whether it's an improvement)
 - More informative exception handling for invalid notation

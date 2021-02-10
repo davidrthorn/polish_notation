@@ -13,9 +13,44 @@ def validate(rpn_expression: str):
         raise InvalidNotationException(rpn_expression, f"Invalid characters: '{' '.join(invalids).rstrip()}'")
 
 
-def calculate(rpn_expression: str) -> int:
+def _operate(operator: str, a: float, b: float) -> float:
+    if operator == "+":
+        return a + b
+    if operator == "-":
+        return a - b
+    if operator == "*":
+        return a * b
+    if operator == "/":
+        return a / b
+
+
+def calculate(rpn_expression: str) -> float:
     validate(rpn_expression)
-    spl = rpn_expression.split()
+    stack = rpn_expression.split()
+    stack.reverse()
+    memory = []
+
+    limit = 100
+    while limit > 0 and len(stack):
+        current = stack.pop()
+
+        if current not in ["+", "/", "*", "-"]:
+            memory.append(current)
+            continue
+
+        back_one = float(memory.pop())
+        back_two = float(memory.pop())
+        result = _operate(current, back_two, back_one)
+        memory.append(result)
+        stack = stack + memory
+
+        limit -= 1
+
+    print(stack)
+    return stack[0]
+
+
+
     # TODO: initial validation (separate function)
     # TODO: the calculation is complete when a single int (the result) remains on the stack
     # TODO: fewer than two operands on the stack when we encounter an operator == Exception

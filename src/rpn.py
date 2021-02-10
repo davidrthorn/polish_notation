@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union
 
 operators = ["+", "/", "*", "-"]
 
@@ -6,7 +6,7 @@ operators = ["+", "/", "*", "-"]
 class InvalidNotationException(Exception):
     def __init__(self, message: str, rpn_expression: str = None):
         if rpn_expression:
-            message += f"Expression: {rpn_expression}"
+            message += f"\nExpression: {rpn_expression}"
         super().__init__(message)
 
 
@@ -47,9 +47,19 @@ def calculate(rpn_expression: str) -> float:
             i += 1
             continue
 
-        # We've hit at an operator, so we have a calculable unit, which is this operator and the two previous numbers
-        operand_1 = stack[i-2]
-        operand_2 = stack[i-1]
+        # We've hit an operator, so we should have a calculable unit (this operator and the two previous numbers)
+        a_index = i-2
+        b_index = i-1
+
+        if a_index < 0 or b_index < 0:
+            raise InvalidNotationException(
+                f"Found an operator not preceded by two or more numbers at position {i}",
+                rpn_expression
+            )
+
+        operand_1 = stack[a_index]
+        operand_2 = stack[b_index]
+
         operator = item
         result = _calculate_unit(operand_1, operand_2, operator)
 

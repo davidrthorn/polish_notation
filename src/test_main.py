@@ -34,6 +34,11 @@ Additional examples
 '''
 
 
+def test_calculate_expression_with_insufficient_sequential_numbers_after_valid_sequence_throws():
+    with pytest.raises(InvalidNotationException):
+        calculate("1 2 - 4 + 5")
+
+
 def test_to_list_returns_list_of_floats_and_symbols_when_input_valid():
     assert to_list("1 2 +") == [1.0, 2.0, '+']
 

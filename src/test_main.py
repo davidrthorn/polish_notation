@@ -2,6 +2,7 @@ import pytest
 
 from src.rpn import calculate, InvalidNotationException, to_list
 
+# TODO: check for the *right* exception
 
 '''
 Provided examples
@@ -39,6 +40,16 @@ def test_calculate_expression_with_insufficient_sequential_numbers_after_valid_s
         calculate("1 2 - 4 + 5")
 
 
+def test_calculate_expression_with_too_many_sequential_numbers_after_valid_sequence_throws():
+    with pytest.raises(InvalidNotationException):
+        calculate("1 2 - 4 4 4 4 +")
+
+
+def test_calculate_expression_with_invalid_operator_sequence_throws():
+    with pytest.raises(InvalidNotationException):
+        calculate("1 2 - 4 + -")
+
+
 def test_to_list_returns_list_of_floats_and_symbols_when_input_valid():
     assert to_list("1 2 +") == [1.0, 2.0, '+']
 
@@ -66,11 +77,10 @@ def test_calculate_empty_string_expression_throws():  # because returning 0 woul
 
 def test_calculate_expression_with_invalid_chars_throws():
     with pytest.raises(InvalidNotationException) as e:
-        calculate("34 + B")
-    assert "Invalid characters: 'B'" in str(e.value)
+        calculate("34 B +")
+    assert "'B'" in str(e.value)
 
 
-# TODO: The exception thrown here should be informative
 def test_calculate_expression_without_delimiters_throws():  # because without delimiters, notation is ambiguous
     with pytest.raises(InvalidNotationException):
         calculate("12-")

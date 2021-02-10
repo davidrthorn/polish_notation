@@ -1,4 +1,5 @@
 from typing import List, Union
+import re
 
 operators = ["+", "/", "*", "-"]
 
@@ -11,14 +12,16 @@ class InvalidNotationException(Exception):
 
 
 def to_list(rpn_expression: str) -> List[Union[float, str]]:
+    if rpn_expression == "":
+        raise InvalidNotationException("Expressions cannot be empty strings")
+
     result = []
     for r in rpn_expression.split():
         if r in operators:
             result.append(r)
             continue
         try:
-            # TODO: how liberal is float? What will it do with False for example?
-            result.append(float(r))
+            result.append(float(r))  # This currently allows the awful expression "False 2.0 +" -- naughty Python!
         except ValueError:
             raise InvalidNotationException(f"'{r}' is not a valid operator or float value")
 
@@ -44,30 +47,30 @@ def calculate(rpn_expression: str) -> float:
 
         item = stack[i]
         if item not in operators:
+            if i == len(stack) - 1:
+                raise InvalidNotationException("Expressions cannot end with a number", rpn_expression)
             i += 1
             continue
 
         # We've hit an operator, so we should have a calculable unit (this operator and the two previous numbers)
-        a_index = i-2
-        b_index = i-1
 
-        if a_index < 0 or b_index < 0:
+        if i < 2:
             raise InvalidNotationException(
                 f"Found an operator not preceded by two or more numbers at position {i}",
                 rpn_expression
             )
 
-        operand_1 = stack[a_index]
-        operand_2 = stack[b_index]
-
+        operand_1 = stack[i-2]
+        operand_2 = stack[i-1]
         operator = item
+
         result = _calculate_unit(operand_1, operand_2, operator)
 
         stack_before_unit = stack[0:i-2]
         stack_after_unit = stack[i+1:]
 
         # Insert the result in place of the unit...
-        stack = stack_before_unit + [result] + stack_after_unit
+        stack = stack_before_unit + [result] + stack_after_unit  # Replacing our stack every time :(
 
         # ...and restart iteration from this point
         i = len(stack_before_unit) + 1

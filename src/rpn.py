@@ -35,20 +35,21 @@ def calculate(rpn_expression: str) -> float:
         current = stack.pop()
 
         if current not in ["+", "/", "*", "-"]:
-            memory.append(current)
+            memory.append(float(current))
             continue
 
-        back_one = float(memory.pop())
-        back_two = float(memory.pop())
+        back_one = memory.pop()
+        back_two = memory.pop()
         result = _operate(current, back_two, back_one)
         memory.append(result)
         stack = stack + memory
 
+        if len(stack) == 1:
+            return stack[0]
+
+        memory = []
+
         limit -= 1
-
-    print(stack)
-    return stack[0]
-
 
 
     # TODO: initial validation (separate function)

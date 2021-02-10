@@ -75,11 +75,11 @@ def test_calculate_invalid_expression_with_invalid_chars_raises():
     assert "'B'" in str(e.value)
 
 
-def test_calculate_invalid_expression_without_delimiters_raises():  # because without delimiters, notation is ambiguous
+def test_calculate_valid_expression_without_delimiters_raises():  # because without delimiters, notation is ambiguous
     with pytest.raises(InvalidNotationException):
         calculate("12-")
 
 
-def test_calculate_invalid_expression_with_spaces_without_delimiters_raises():
+def test_calculate_valid_expression_with_spaces_without_delimiters_raises():
     with pytest.raises(InvalidNotationException):
         calculate("12- 4 +")

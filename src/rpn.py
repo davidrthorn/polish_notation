@@ -25,7 +25,7 @@ def to_list(rpn_expression: str) -> List[Union[float, str]]:
     return result
 
 
-def _operate(a: float, b: float, operator: str) -> float:
+def _calculate_unit(a: float, b: float, operator: str) -> float:
     if operator == "+":
         return a + b
     if operator == "-":
@@ -36,40 +36,30 @@ def _operate(a: float, b: float, operator: str) -> float:
         return a / b
 
 
-# The action is when we hit an operator, apply this thing to the last two things in the array (replace them)
 def calculate(rpn_expression: str) -> float:
     stack = to_list(rpn_expression)
+
     i = 0
+    while len(stack) > 1:
 
-    limit = 100
-    # TODO: risk of infinity here if something goes wrong
-    while len(stack):
-
-        if not limit:
-            raise Exception("HIT LIMIT")
-        limit -= 1
-
-        if len(stack) == 1:
-            return stack[0]
-
-        current = stack[i]
-        if current in operators:
-            before_this_unit = stack[0:i - 2]
-            result_for_this_unit = _operate(stack[i - 2], stack[i - 1], current)
-            rest_of_stack = stack[i+1:]
-
-            stack = before_this_unit + [result_for_this_unit] + rest_of_stack
-            i = len(before_this_unit) + 1
+        item = stack[i]
+        if item not in operators:
+            i += 1
             continue
 
-        i += 1
+        # We've hit at an operator, so we have a calculable unit, which is this operator and the two previous numbers
+        operand_1 = stack[i-2]
+        operand_2 = stack[i-1]
+        operator = item
+        result = _calculate_unit(operand_1, operand_2, operator)
 
+        stack_before_unit = stack[0:i-2]
+        stack_after_unit = stack[i+1:]
 
+        # Insert the result in place of the unit...
+        stack = stack_before_unit + [result] + stack_after_unit
 
-    # TODO: initial validation (separate function)
-    # TODO: the calculation is complete when a single int (the result) remains on the stack
-    # TODO: fewer than two operands on the stack when we encounter an operator == Exception
+        # ...and restart iteration from this point
+        i = len(stack_before_unit) + 1
 
-    return 0
-
-
+    return stack[0]

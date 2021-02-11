@@ -73,7 +73,11 @@ def calculate(rpn_expression: str) -> float:
         # ...and restart iteration from this point
         i = len(stack_before_unit) + 1
 
-    return stack[0]
+    answer = stack[0]
+    if not isinstance(answer, float):
+        raise InvalidNotationException(f"Answer was '{answer}', which is not a valid float", rpn_expression=rpn_expression)
+
+    return answer
 
 
 '''
